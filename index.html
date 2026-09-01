@@ -1,0 +1,291 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cafe Special Discount Verification</title>
+    <!-- Google Fonts & FontAwesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+        body { 
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            display: flex; 
+            flex-direction: column;
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            padding: 20px;
+            color: #333;
+        }
+
+        /* Top Social Media Bar */
+        .social-header {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            padding: 10px 20px;
+            margin-bottom: 25px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+        .social-link {
+            color: #f8fafc;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+        }
+        .social-link i { font-size: 16px; }
+        .social-link.insta i { color: #e1306c; }
+        .social-link.yt i { color: #ff0000; }
+        .social-link:hover { opacity: 0.8; transform: translateY(-1px); }
+
+        /* Main Card Container */
+        .card { 
+            background: #ffffff; 
+            padding: 35px 25px; 
+            border-radius: 20px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3); 
+            text-align: center; 
+            width: 100%; 
+            max-width: 380px; 
+            position: relative;
+            overflow: hidden;
+        }
+        .card-header {
+            margin-bottom: 25px;
+        }
+        .card-header .icon-box {
+            width: 60px;
+            height: 60px;
+            background: #ffe3e3;
+            color: #ff4757;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            font-size: 24px;
+        }
+        .card-header h2 { font-size: 22px; font-weight: 700; color: #1e293b; }
+        .card-header p { font-size: 13px; color: #64748b; margin-top: 4px; }
+
+        /* Input Styling */
+        .input-group { 
+            position: relative; 
+            margin-bottom: 18px; 
+        }
+        .prefix {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-weight: 600;
+            color: #475569;
+            font-size: 15px;
+            border-right: 1px solid #cbd5e1;
+            padding-right: 10px;
+        }
+        input { 
+            width: 100%; 
+            padding: 14px; 
+            padding-left: 65px; 
+            border: 2px solid #e2e8f0; 
+            border-radius: 10px; 
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s;
+            background: #f8fafc;
+            color: #0f172a;
+            font-weight: 500;
+        }
+        input:focus { border-color: #ff4757; background: #fff; }
+        input#otp {
+            padding-left: 14px;
+            text-align: center;
+            letter-spacing: 4px;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        /* Buttons */
+        button { 
+            width: 100%; 
+            padding: 14px; 
+            background: #ff4757; 
+            color: white; 
+            border: none; 
+            border-radius: 10px; 
+            font-weight: 600; 
+            font-size: 15px; 
+            cursor: pointer; 
+            box-shadow: 0 4px 12px rgba(255, 71, 87, 0.3);
+            transition: all 0.3s ease;
+        }
+        button:hover { background: #e03847; transform: translateY(-1px); }
+        button:disabled { background: #cbd5e1; box-shadow: none; cursor: not-allowed; }
+
+        /* Error & Status */
+        #status { color: #10b981; font-size: 15px; font-weight: 600; margin-top: 15px; }
+        #error-msg { 
+            color: #ef4444; 
+            font-size: 13px; 
+            margin-top: 12px; 
+            display: none; 
+            background: #fef2f2;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #fee2e2;
+        }
+    </style>
+
+    <!-- Google Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+
+<!-- Social Links Header -->
+<div class="social-header">
+    <a href="https://instagram.com/khizarit" target="_blank" class="social-link insta">
+        <i class="fa-brands fa-instagram"></i> @khizarit
+    </a>
+    <a href="https://instagram.com/editz_khizar_45" target="_blank" class="social-link insta">
+        <i class="fa-brands fa-instagram"></i> @editz_khizar_45
+    </a>
+    <a href="https://youtube.com/@Teams3" target="_blank" class="social-link yt">
+        <i class="fa-brands fa-youtube"></i> @Teams3
+    </a>
+</div>
+
+<!-- Main Verification Card -->
+<div class="card">
+    <div class="card-header">
+        <div class="icon-box"><i class="fa-solid fa-utensils"></i></div>
+        <h2>Cafe Special Offer</h2>
+        <p>Enter mobile number to get instant discount code</p>
+    </div>
+    
+    <!-- Step 1: Mobile Section -->
+    <div id="phone-section">
+        <div class="input-group">
+            <span class="prefix">+91</span>
+            <input type="tel" id="number" placeholder="Mobile Number" maxlength="10">
+        </div>
+        <div id="recaptcha-container"></div>
+        <button id="send-btn" onclick="sendOTP()">Send Verification Code</button>
+    </div>
+
+    <!-- Step 2: OTP Section -->
+    <div id="otp-section" style="display:none;">
+        <div class="input-group">
+            <input type="text" id="otp" placeholder="Enter OTP" maxlength="6">
+        </div>
+        <button id="verify-btn" onclick="verifyOTP()">Verify OTP</button>
+    </div>
+
+    <div id="error-msg"></div>
+    <h4 id="status"></h4>
+</div>
+
+<script>
+  // Firebase Configuration Keys
+  const firebaseConfig = {
+    apiKey: "AIzaSyBBOXeJhzTmoADOSZXhwXWJ-9l4093savg",
+    authDomain: "cafeotp-d4890.firebaseapp.com",
+    projectId: "cafeotp-d4890",
+  };
+  
+  firebase.initializeApp(firebaseConfig);
+  let confirmationResultGlobal;
+
+  window.onload = function() {
+      window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+          'size': 'invisible'
+      });
+  };
+
+  function showError(msg) {
+      let errDiv = document.getElementById('error-msg');
+      errDiv.innerText = msg;
+      errDiv.style.display = 'block';
+  }
+
+  function hideError() {
+      let errDiv = document.getElementById('error-msg');
+      errDiv.innerText = '';
+      errDiv.style.display = 'none';
+  }
+
+  function sendOTP() {
+      hideError();
+      let rawNumber = document.getElementById('number').value.trim();
+      
+      if(rawNumber.length !== 10 || isNaN(rawNumber)) {
+          showError("Please enter a valid 10-digit mobile number.");
+          return;
+      }
+
+      let phoneNumber = "+91" + rawNumber;
+      let appVerifier = window.recaptchaVerifier;
+      let btn = document.getElementById('send-btn');
+      
+      btn.disabled = true;
+      btn.innerText = "Sending Code...";
+
+      firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
+          .then((confirmationResult) => {
+              confirmationResultGlobal = confirmationResult;
+              document.getElementById('phone-section').style.display = 'none';
+              document.getElementById('otp-section').style.display = 'block';
+          }).catch((error) => {
+              console.error(error);
+              btn.disabled = false;
+              btn.innerText = "Send Verification Code";
+              
+              if(error.code === 'auth/invalid-app-credential' || error.code === 'auth/internal-error') {
+                  showError("Please upload this page to Netlify/Hosting to send real OTP.");
+              } else {
+                  showError("Error: " + error.message);
+              }
+          });
+  }
+
+  function verifyOTP() {
+      hideError();
+      let code = document.getElementById('otp').value.trim();
+      
+      if(code.length !== 6 || isNaN(code)) {
+          showError("Please enter a valid 6-digit OTP.");
+          return;
+      }
+
+      let btn = document.getElementById('verify-btn');
+      btn.disabled = true;
+      btn.innerText = "Verifying...";
+
+      confirmationResultGlobal.confirm(code).then((result) => {
+          document.getElementById('otp-section').style.display = 'none';
+          document.getElementById('status').innerText = "✓ Customer Verified! Enjoy Your Offer.";
+      }).catch((error) => {
+          console.error(error);
+          btn.disabled = false;
+          btn.innerText = "Verify OTP";
+          showError("Invalid OTP. Please check again.");
+      });
+  }
+</script>
+
+</body>
+</html>
